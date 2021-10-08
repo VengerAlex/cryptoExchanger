@@ -38,6 +38,16 @@ const useStyles = makeStyles({
         justifyContent: 'space-between',
         marginBottom: '10px'
     },
+    coinImg: {
+        width: '40px',
+        height: '20px',
+    },
+    tableRow: {
+        transition: 'all 50ms ease-in',
+        '&:hover': {
+            background: "#93cec0",
+        },
+    }
 });
 
 type TCoin = {
@@ -45,16 +55,30 @@ type TCoin = {
     fullName: string;
     imageUrl: string;
     price: number;
-    volume24Hour: string;
+    volume24Hour: number;
 }
 
 const App = () => {
     const classes = useStyles();
-    const [coins, setCoins] = useState<TCoin[] | null>(null);
+    const [coins, setCoins] = useState<TCoin[]>([]);
 
     useEffect(() => {
         axios.get('https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=USD')
-            .then(({data: {Data: data}}) => setCoins(data))
+            .then(({data: {Data}}:any) => {
+                const coins = Data.map((el: any) => {
+                    const obj: TCoin = {
+                        name: el.CoinInfo.Name,
+                        fullName: el.CoinInfo.FullName,
+                        imageUrl: `https://www.cryptocompare.com${el.CoinInfo.ImageUrl}`,
+                        price: parseInt(el.RAW.USD.PRICE),
+                        volume24Hour: parseInt(el.RAW.USD.VOLUME24HOUR),
+                    }
+
+                    return obj
+                })
+
+                setCoins(coins)
+            })
     }, [])
 
     console.log(coins);
@@ -66,25 +90,30 @@ const App = () => {
                 <Grid item xs={8}>
                     <Paper className={classes.paper}>
                         <TableContainer component={Paper}>
-                            <Table sx={{minWidth: 650}} aria-label="simple table">
+                            <Table sx={{maxWidth: 900}} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell align="left">FullName</TableCell>
+                                        <TableCell align="left"></TableCell>
                                         <TableCell align="left">Name</TableCell>
+                                        <TableCell align="left">FullName</TableCell>
                                         <TableCell align="left">Price</TableCell>
                                         <TableCell align="left">Volume24Hour</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {coins.map((el) => (
-                                        <TableRow key={el.Id}>
-                                            {/*<TableCell>123</TableCell>*/}
-                                            <TableCell component="th" scope="row">
-                                                {el.FullName}</TableCell>
-                                            {/*<TableCell align="left">{row.calories}</TableCell>*/}
-                                            {/*<TableCell align="left">{row.fat}</TableCell>*/}
-                                            {/*<TableCell align="left">{row.carbs}</TableCell>*/}
-                                            {/*<TableCell align="left">{row.protein}</TableCell>*/}
+                                    {coins.map((el,id) => (
+                                        <TableRow className={classes.tableRow} key={el.name}>
+                                            <TableCell align="left">
+                                                <img
+                                                    className={classes.coinImg}
+                                                    src={el.imageUrl}
+                                                    alt='Coin Icon'
+                                                />
+                                            </TableCell>
+                                            <TableCell align="left">{el.name}</TableCell>
+                                            <TableCell align="left">{el.fullName}</TableCell>
+                                            <TableCell align="left">$ {el.price}</TableCell>
+                                            <TableCell align="left">{el.volume24Hour}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
