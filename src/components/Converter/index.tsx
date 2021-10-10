@@ -6,56 +6,61 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
+import {inject, observer} from "mobx-react";
+import CurrencyStore from "../../stores/currencyStore";
 
-type IConverterBlock = {
+type IConverter = {
     classes: any;
+    currencyStore?: CurrencyStore;
 }
 
+const Converter: React.FC<IConverter> = inject('currencyStore')(
+    observer(({classes, currencyStore}) => {
+        const coins: string[] = currencyStore!.getItems.map(el => el.name)
 
-const Converter: React.FC<IConverterBlock>  = ({ classes}) => {
 
-    return (
-        <Grid item xs={4}>
-            <Paper className={classes.paper}>
-                <div className={classes.cryptoInput}>
-                    <FormControl>
-                        <TextField
-                            fullWidth
-                            label="Summ"
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <Select
-                            value={10}
-                            label="Age"
-                        >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
-                        </Select>
-                    </FormControl>
-                </div>
-                <div className={classes.cryptoInput}>
-                    <FormControl>
-                        <TextField
-                            fullWidth
-                            label="Summ"
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <Select
-                            value={10}
-                            label="Age"
-                        >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
-                        </Select>
-                    </FormControl>
-                </div>
-            </Paper>
-        </Grid>
-    );
-};
+        return (
+            <Grid item xs={4}>
+                <Paper className={classes.paper}>
+                    <div className={classes.cryptoInput}>
+                        <FormControl>
+                            <TextField
+                                fullWidth
+                                label="Summ"
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <Select
+                                value={coins[0]}
+                                label="Age"
+                            >
+                                {coins.map(el => (
+                                    <MenuItem key={el} value={el}>{el}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </div>
+                    <div className={classes.cryptoInput}>
+                        <FormControl>
+                            <TextField
+                                fullWidth
+                                label="Summ"
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <Select
+                                value={coins[0]}
+                                label="Age"
+                            >
+                                {coins.map(el => (
+                                    <MenuItem key={el} value={el}>{el}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </div>
+                </Paper>
+            </Grid>
+        );
+    }));
 
 export default Converter
